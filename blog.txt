@@ -1,0 +1,110 @@
+# In Defense of the Monolith
+
+We often curse at monolithic projects, and our first reflex is to try to break them into microservices.
+
+Microservice? Good!
+Monolith? Bad!
+
+But today, I’m going to defend the monolith.
+
+Yes, I will.
+
+Put those pitchforks down and blow out those torches.
+
+Monoliths are actually a very good choice for new projects and small projects. They avoid the overhead of designing and maintaining an entire architecture made up of multiple services. They’re easier to change course because a change can be made in one place, rather than across 27 repositories using 28 different structures.
+
+Monoliths are simple¹, concise², fit in your head³, and fit in your computer⁴.
+
+They’re easy to run: you don’t need to start 27 Docker containers on your 8 GB RAM laptop just to work on a feature. The whole project can usually be opened in one session of your favourite editor or IDE. A new feature can live in a single merge request, in a single repository.
+
+They’re also much friendlier to junior developers and give new joiners a gentler learning curve. There are fewer moving parts, fewer systems to understand, and fewer places to look when something goes wrong.
+
+But, of course, like any cute baby, small projects grow.
+
+And if they don’t have some guidance along the way, they can become awkward teenage projects, dysfunctional adult projects, and eventually middle-aged, divorced, sedentary, underemployed, creepy projects that can barely get off the couch to answer the door for the pizza delivery guy.
+
+## Growing pains
+
+To prevent this kind of unguided growth, software engineers have come up with dozens of frameworks, patterns, designs, architectures and methodologies that promise to keep a codebase under control.
+
+And, to be fair, many of them work very well.
+
+Until someone decides that *this time* they’re going to do things a little differently.
+
+Just for this feature.
+
+Because the director is breathing down their neck and wanted it yesterday.
+
+Then another team decides that this structure isn’t quite right and that *their* structure would be better. Someone introduces a new pattern. Someone else copies a pattern from another project. A third person decides that the first two patterns are too complicated and invents a fourth one.
+
+Python is particularly susceptible to this. Its flexibility is one of its greatest strengths: it gives you an enormous amount of freedom to do things however you want⁵. Unfortunately, that also means that there aren’t many guardrails stopping everyone from doing things *differently*.
+
+Five years and three completely new teams later, you have a project desperately trying to get off the couch to answer the pizza delivery guy.
+
+I’ve studied all these approaches and did the logical thing:
+
+**I created a new one that solves all the problems.⁶**
+
+## I present to you: Chisel
+
+A chisel is how you carve a monolith.
+
+Python codebases have a tendency to slowly set into one enormous block of code. Every module reaches into every other module, and eventually nothing can be lifted out without something else breaking.
+
+**Chisel** is designed to help in two directions.
+
+### 1. Breaking a monolith apart
+
+Draw a boundary around a feature, service, or module. Declare the small number of files, modules, or objects that the rest of the code is allowed to use.
+
+Chisel then shows you every place where the rest of the code reaches past those boundaries.
+
+That list becomes your work plan.
+
+Instead of asking *"What depends on this?"* and spending three days searching through a codebase, you can ask Chisel.
+
+And when you've fixed all the leaks, you have something that can potentially be extracted.
+
+### 2. Keeping it from setting again
+
+Once you’ve established those boundaries, you don’t want them to slowly disappear.
+
+So run the same checks in CI.
+
+If someone introduces new code that crosses a boundary, the build fails.
+
+The architecture becomes something the codebase enforces rather than something written in a document that everyone forgets exists.
+
+## Static analysis, nothing more
+
+Chisel is deliberately boring in one important respect: it doesn’t run your code.
+
+Everything is static.
+
+Python files are parsed using the standard-library `ast` module. Nothing in your project is imported or executed, and Chisel has no third-party dependencies.
+
+It currently provides:
+
+* **Boundary checks** — fail CI when code outside a boundary uses anything other than that boundary’s declared interfaces.
+* **Boundary graphs** — visualise each boundary, its interfaces, internals, and connections, with leaks highlighted in red.
+* **Import graphs** — see which files import which other files, exported as Graphviz DOT. Graphs can be generated per file or per package, with import cycles highlighted.
+* **Symbol reports** — see what every file defines and imports: variables, functions, classes, methods, properties, `self.x` attributes, and more.
+
+The goal isn't to tell you that your monolith is bad.
+
+Quite the opposite.
+
+**The goal is to make it possible to keep a monolith healthy as it grows — and, when the time comes, to carve pieces out of it without taking the whole thing down.**
+
+A monolith doesn't have to become a mess.
+
+You just need a chisel.
+
+---
+
+¹ As are pit traps, grenades and crocodiles.
+² As are condolence messages, grenades and crocodiles.
+³ Citation needed.
+⁴ Until they don't.
+⁵ XKCD: `import antigravity`.
+⁶ XKCD: JavaScript frameworks.
