@@ -1,0 +1,426 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>In Defense of the Monolith</title>
+
+  <style>
+    /* Yes, I did steal this CSS. Sue me! */
+    body {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      font: 16px/1.6 system-ui, sans-serif;
+      color: #222;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: 2em;
+    }
+
+    h2 {
+      margin-top: 2em;
+    }
+
+    h3 {
+      margin-top: 1.5em;
+    }
+
+    code {
+      padding: 2px 4px;
+      background: #f3f3f3;
+      border-radius: 3px;
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      background: #f3f3f3;
+      border-radius: 4px;
+    }
+
+    blockquote {
+      margin-left: 0;
+      padding-left: 1em;
+      border-left: 3px solid #ccc;
+      color: #666;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    .image-right {
+      float: right;
+      width: 260px;
+      margin: 0 0 20px 25px;
+    }
+
+    .image-left {
+      float: left;
+      width: 260px;
+      margin: 0 25px 20px 0;
+    }
+
+    .image-right img,
+    .image-left img {
+      width: 100%;
+      height: auto;
+    }
+
+    .clear {
+      clear: both;
+    }
+
+    hr {
+      margin: 3em 0;
+      border: 0;
+      border-top: 1px solid #ddd;
+    }
+
+    @media (max-width: 600px) {
+      .image-right,
+      .image-left {
+        float: none;
+        width: 100%;
+        margin: 20px 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<article>
+
+  <h1>In Defense of the Monolith</h1>
+
+  <p>
+    We often curse at monolithic projects, and our first reflex is to try
+    to break them into microservices.
+  </p>
+
+  <p>
+    <strong>Microservice? Good!<br>
+    Monolith? Bad!</strong>
+  </p>
+
+  <p>But today, I’m going to defend the monolith.</p>
+
+  <p>Yes, I will.</p>
+
+  <p>Put those pitchforks down and blow out those torches.</p>
+
+  <p>
+    Monoliths are actually a very good choice for new projects and small
+    projects. They avoid the overhead of designing and maintaining an entire
+    architecture made up of multiple services. They’re easier to change
+    course because a change can be made in one place, rather than across
+    27 repositories using 28 different structures.
+  </p>
+
+  <p>
+    Monoliths are simple<sup>1</sup>, concise<sup>2</sup>, fit in your
+    head<sup>3</sup>, and fit in your computer<sup>4</sup>.
+  </p>
+
+  <p>
+    They’re easy to run: you don’t need to start 27 Docker containers on
+    your 8 GB RAM laptop just to work on a feature. The whole project can
+    usually be opened in one session of your favourite editor or IDE. A new
+    feature can live in a single merge request, in a single repository.
+  </p>
+
+  <p>
+    They’re also much friendlier to junior developers and give new joiners
+    a gentler learning curve. There are fewer moving parts, fewer systems
+    to understand, and fewer places to look when something goes wrong.
+  </p>
+
+  <p>
+    But, of course, like any cute baby, small projects grow.
+  </p>
+
+  <p>
+    And if they don’t have some guidance along the way, they can become
+    awkward teenage projects, dysfunctional adult projects, and eventually
+    middle-aged, divorced, sedentary, underemployed, creepy projects that
+    can barely get off the couch to answer the door for the pizza delivery
+    guy.
+  </p>
+
+  <h2>Growing pains</h2>
+
+  <p>
+    To prevent this kind of unguided growth, software engineers have come
+    up with dozens of frameworks, patterns, designs, architectures and
+    methodologies that promise to keep a codebase under control.
+  </p>
+
+  <p>And, to be fair, many of them work very well.</p>
+
+  <p>
+    Until someone decides that <em>this time</em> they’re going to do things
+    a little differently.
+  </p>
+
+  <p>Just for this feature.</p>
+
+  <p>
+    Because the director is breathing down their neck and wanted it yesterday.
+  </p>
+
+  <p>
+    Then another team decides that this structure isn’t quite right and
+    that <em>their</em> structure would be better. Someone introduces a new
+    pattern. Someone else copies a pattern from another project. A third
+    person decides that the first two patterns are too complicated and
+    invents a fourth one.
+  </p>
+
+  <p>
+    Python is particularly susceptible to this. Its flexibility is one of
+    its greatest strengths: it gives you an enormous amount of freedom to
+    do things however you want<sup>5</sup>. Unfortunately, that also means
+    that there aren’t many guardrails stopping everyone from doing things
+    <em>differently</em>.
+  </p>
+
+  <p>
+    Five years and three completely new teams later, you have a project
+    desperately trying to get off the couch to answer the pizza delivery
+    guy.
+  </p>
+
+  <p>I’ve studied all these approaches and did the logical thing:</p>
+
+  <p>
+    <strong>
+      I created a new one that solves all the problems.<sup>6</sup>
+    </strong>
+  </p>
+
+  <h2>I present to you: Chisel</h2>
+
+  <p>A chisel is how you carve a monolith.</p>
+
+  <p>
+    Python codebases have a tendency to slowly set into one enormous block
+    of code. Every module reaches into every other module, and eventually
+    nothing can be lifted out without something else breaking.
+  </p>
+
+  <p>
+    <strong>Chisel</strong> is designed to help in three directions.
+  </p>
+
+  <h3>1. Preventing the monolithic mess</h3>
+
+  <figure class="image-right">
+    <img
+      src="imgs/boulder.png"
+      alt="boulder">
+  </figure>
+
+  <p>
+    Chisel doesn't tell you how to structure your project.
+  </p>
+
+  <p>
+    It doesn't prescribe a particular file structure, framework, design
+    pattern, or architecture. That's for you to decide.
+  </p>
+
+  <p>
+    But most good designs have one thing in common: some kind of
+    encapsulated unit of code. You might call it a service, a domain, a
+    model, a component, a module, or something else entirely.
+  </p>
+
+  <p>
+    Whatever you call it, it should have a small, well-defined set of
+    connections to the rest of the system.
+  </p>
+
+  <p>
+    You might call those connections APIs, interfaces, public methods,
+    views, or something else. Chisel calls them <strong>interfaces</strong>.
+  </p>
+
+  <p>
+    The encapsulated parts are protected by <strong>boundaries</strong>.
+    The things we deliberately expose to the rest of the system are
+    <strong>interfaces</strong>.
+  </p>
+
+  <p>
+    Once you've established those boundaries and interfaces, you don't want
+    them to slowly disappear.
+  </p>
+
+  <p>So run Chisel's checks in CI.</p>
+
+  <p>
+    If someone introduces new code that crosses a boundary and reaches
+    directly into its internals, the build fails.
+  </p>
+
+  <p>
+    The architecture becomes something the codebase enforces rather than
+    something written in a document sitting somewhere and waiting to die.
+  </p>
+
+  <div class="clear"></div>
+
+  <h3>2. Breaking a monolith apart</h3>
+
+  <p>So your code grew.</p>
+
+  <p>
+    Now you have hundreds of features, models, domains, heads, tentacles
+    and sharp teeth.
+  </p>
+
+  <p>
+    But the CI checks kept the boundaries well defined and the interfaces
+    centralised.
+  </p>
+
+  <p>
+    Now, when you eventually decide that one of those pieces really should
+    become its own service, you have a much easier job.
+  </p>
+
+  <p>The boundary is already there.</p>
+
+  <p>The interface is already defined.</p>
+
+  <p>
+    Instead of untangling a giant ball of dependencies, you implement the
+    few interface connections needed by the new service and move the code
+    away.
+  </p>
+
+  <p>
+    That's what the chisel is for: not smashing the monolith into pieces,
+    but carving along the lines you've already defined.
+  </p>
+
+  <h3>3. Cleaning up your old mess</h3>
+
+  <p>
+    Maybe you're reading all this while sitting next to a monstrous
+    monolith that is already struggling to breathe.
+  </p>
+
+  <p>That's fine too.</p>
+
+  <p>Chisel can help you work backwards.</p>
+
+  <p>
+    Draw a boundary around a feature, service, or module. Declare the small
+    number of files, modules, or objects that the rest of the code is
+    allowed to use as interfaces.
+  </p>
+
+  <p>
+    Chisel then shows you every place where the rest of the code reaches
+    past those boundaries.
+  </p>
+
+  <p>That list becomes your work plan.</p>
+
+  <p>
+    Instead of asking <em>"What depends on this?"</em> and spending three
+    days searching through a codebase, you can ask Chisel.
+  </p>
+
+  <p>It will show you where the leaks are.</p>
+
+  <p>
+    Fix the leaks, and you have something that can eventually be extracted.
+  </p>
+
+  <h2>Static analysis, nothing more</h2>
+
+  <p>
+    Chisel is deliberately boring in one important respect: it doesn’t run
+    your code.
+  </p>
+
+  <figure class="image-left">
+    <img
+      src="imgs/boulder.png"
+      alt="boulder">
+  </figure>
+
+  <p><strong>Everything is static.</strong></p>
+
+  <p>
+    Python files are parsed using the standard-library <code>ast</code>
+    module. Nothing in your project is imported or executed, and Chisel has
+    no third-party dependencies.
+  </p>
+
+  <p>It currently provides:</p>
+
+  <ul>
+    <li>
+      <strong>Boundary checks</strong> — fail CI when code outside a
+      boundary uses anything other than that boundary’s declared interfaces.
+    </li>
+    <li>
+      <strong>Boundary graphs</strong> — visualise each boundary, its
+      interfaces, internals, and connections, with leaks highlighted in red.
+    </li>
+    <li>
+      <strong>Import graphs</strong> — see which files import which other
+      files, exported as Graphviz DOT. Graphs can be generated per file or
+      per package, with import cycles highlighted.
+    </li>
+    <li>
+      <strong>Symbol reports</strong> — see what every file defines and
+      imports: variables, functions, classes, methods, properties,
+      <code>self.x</code> attributes, and more.
+    </li>
+  </ul>
+
+  <div class="clear"></div>
+
+  <p>
+    The goal isn't to tell you that your monolith is bad.
+  </p>
+
+  <p>Quite the opposite.</p>
+
+  <p>
+    <strong>
+      The goal is to make it possible to keep a monolith healthy as it grows
+      — and, when the time comes, to carve pieces out of it without taking
+      the whole thing down.
+    </strong>
+  </p>
+
+  <p>A monolith doesn't have to become a mess.</p>
+
+  <p><strong>You just need a sharp  chisel.</strong></p>
+
+  <hr>
+
+  <ol>
+    <li>As are pit traps, grenades and crocodiles.</li>
+    <li>As are condolence messages, grenades and crocodiles.</li>
+    <li>Citation needed.</li>
+    <li>Until they don't.</li>
+    <li>XKCD: <code>import antigravity</code>.</li>
+    <li>XKCD: JavaScript frameworks.</li>
+  </ol>
+
+</article>
+
+</body>
+</html>
